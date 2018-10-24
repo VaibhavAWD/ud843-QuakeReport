@@ -21,6 +21,7 @@ import android.widget.ListView;
 
 import com.example.android.quakereport.adapter.EarthquakeAdapter;
 import com.example.android.quakereport.model.Earthquake;
+import com.example.android.quakereport.utils.QueryUtils;
 
 import java.util.ArrayList;
 
@@ -37,26 +38,10 @@ public class EarthquakeActivity extends AppCompatActivity {
         ListView earthquakeListView = findViewById(R.id.list);
 
         // Create a new {@link EarthquakeAdapter} of earthquakes
-        EarthquakeAdapter earthquakeAdapter = new EarthquakeAdapter(this, getEarthquakeList());
+        EarthquakeAdapter earthquakeAdapter = new EarthquakeAdapter(this, QueryUtils.extractEarthquakes());
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
         earthquakeListView.setAdapter(earthquakeAdapter);
-    }
-
-    private ArrayList<Earthquake> getEarthquakeList() {
-        ArrayList<Earthquake> earthquakeList = new ArrayList<>();
-        earthquakeList.add(new Earthquake(7.9, "San Fransisco", "Nov 12, 2016"));
-        earthquakeList.add(new Earthquake(6.1, "London", "Jan 21, 2015"));
-        earthquakeList.add(new Earthquake(5.4, "Mexico City", "May 30, 2014"));
-        earthquakeList.add(new Earthquake(4.8, "Tokyo", "Jun 15, 2013"));
-        earthquakeList.add(new Earthquake(6.3, "San Fransisco", "Aug 21, 2012"));
-        earthquakeList.add(new Earthquake(5.3, "Hong Kong", "Oct 16, 2011"));
-        earthquakeList.add(new Earthquake(7.1, "Rio de Janeiro", "Dec 11, 2010"));
-        earthquakeList.add(new Earthquake(4.9, "Paris", "Apr 19, 2009"));
-        earthquakeList.add(new Earthquake(5.7, "Moscow", "Feb 26, 2008"));
-        earthquakeList.add(new Earthquake(6.2, "Havana", "Jul 28, 2007"));
-
-        return earthquakeList;
     }
 }
