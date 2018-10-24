@@ -71,10 +71,10 @@ public final class QueryUtils {
                 String place = properties.optString("place");
 
                 // Get time when the earthquake occurred
-                String date = String.valueOf(properties.optString("time"));
+                long time = properties.optLong("time");
 
                 // Add the earthquake to the list
-                earthquakes.add(new Earthquake(magnitude, place, date));
+                earthquakes.add(new Earthquake(magnitude, place, time));
             }
         } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,
