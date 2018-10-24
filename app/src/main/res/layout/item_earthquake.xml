@@ -13,12 +13,25 @@
         android:layout_weight="1"
         tools:text="7.9" />
 
-    <TextView
-        android:id="@+id/tv_place"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        tools:text="San Fransisco" />
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_offset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="12KM N of" />
+
+        <TextView
+            android:id="@+id/tv_place"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="San Fransisco" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="0dp"
