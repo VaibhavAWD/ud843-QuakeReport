@@ -21,6 +21,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
+
+    private static final String LOCATION_SEPARATOR = " of ";
+
     public EarthquakeAdapter(@NonNull Context context, @NonNull List<Earthquake> earthquakeList) {
         super(context, 0, earthquakeList);
     }
@@ -28,6 +31,9 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
     class EarthquakeViewHolder {
         @BindView(R.id.tv_magnitude)
         TextView mMagnitude;
+
+        @BindView(R.id.tv_offset)
+        TextView mOffset;
 
         @BindView(R.id.tv_place)
         TextView mPlace;
@@ -64,7 +70,20 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         String magnitude = String.valueOf(earthquake.getMagnitude());
         earthquakeViewHolder.mMagnitude.setText(magnitude);
 
-        String place = earthquake.getPlace();
+        String originalPlace = earthquake.getPlace();
+        String offset;
+        String place;
+        if (originalPlace.contains(LOCATION_SEPARATOR)) {
+            String[] placeParts = originalPlace.split(LOCATION_SEPARATOR);
+            offset = placeParts[0] + LOCATION_SEPARATOR;
+            place = placeParts[1];
+        } else {
+            offset = getContext().getString(R.string.near_the);
+            place = originalPlace;
+        }
+
+        earthquakeViewHolder.mOffset.setText(offset);
+
         earthquakeViewHolder.mPlace.setText(place);
 
         String date = getFormattedDate(earthquake.getTime());
