@@ -1,8 +1,10 @@
 package com.example.android.quakereport.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +70,10 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
         Earthquake earthquake = getItem(position);
 
+        GradientDrawable magnitudeCircle = (GradientDrawable) earthquakeViewHolder.mMagnitude.getBackground();
+        int magnitudeColor = getMagnitudeColor(earthquake.getMagnitude());
+        magnitudeCircle.setColor(magnitudeColor);
+
         String magnitude = getFormattedMagnitude(earthquake.getMagnitude());
         earthquakeViewHolder.mMagnitude.setText(magnitude);
 
@@ -94,6 +100,45 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         earthquakeViewHolder.mTime.setText(time);
 
         return earthquakeView;
+    }
+
+    private int getMagnitudeColor(double magnitude) {
+        int magnitudeColor;
+        int magnitudeFloor = (int) Math.floor(magnitude);
+        switch (magnitudeFloor) {
+            case 0:
+            case 1:
+                magnitudeColor = R.color.magnitude1;
+                break;
+            case 2:
+                magnitudeColor = R.color.magnitude2;
+                break;
+            case 3:
+                magnitudeColor = R.color.magnitude3;
+                break;
+            case 4:
+                magnitudeColor = R.color.magnitude4;
+                break;
+            case 5:
+                magnitudeColor = R.color.magnitude5;
+                break;
+            case 6:
+                magnitudeColor = R.color.magnitude6;
+                break;
+            case 7:
+                magnitudeColor = R.color.magnitude7;
+                break;
+            case 8:
+                magnitudeColor = R.color.magnitude8;
+                break;
+            case 9:
+                magnitudeColor = R.color.magnitude9;
+                break;
+            default:
+                magnitudeColor = R.color.magnitude10plus;
+                break;
+        }
+        return ContextCompat.getColor(getContext(), magnitudeColor);
     }
 
     private String getFormattedMagnitude(double magnitude) {
