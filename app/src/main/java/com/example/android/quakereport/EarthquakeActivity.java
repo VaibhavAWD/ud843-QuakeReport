@@ -15,9 +15,14 @@
  */
 package com.example.android.quakereport;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.android.quakereport.adapter.EarthquakeAdapter;
 import com.example.android.quakereport.model.Earthquake;
@@ -43,5 +48,21 @@ public class EarthquakeActivity extends AppCompatActivity {
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
         earthquakeListView.setAdapter(earthquakeAdapter);
+
+        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Earthquake earthquake = (Earthquake) adapterView.getAdapter().getItem(position);
+                Uri earthquakeUrl = Uri.parse(earthquake.getUrl());
+
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                browserIntent.setData(earthquakeUrl);
+                if (browserIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(browserIntent);
+                } else {
+                    Toast.makeText(EarthquakeActivity.this, R.string.warn_no_app_found, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
