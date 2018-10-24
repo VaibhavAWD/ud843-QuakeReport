@@ -12,7 +12,10 @@ import android.widget.TextView;
 import com.example.android.quakereport.R;
 import com.example.android.quakereport.model.Earthquake;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +34,9 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
         @BindView(R.id.tv_date)
         TextView mDate;
+
+        @BindView(R.id.tv_time)
+        TextView mTime;
 
         EarthquakeViewHolder(View earthquakeView) {
             ButterKnife.bind(this, earthquakeView);
@@ -61,9 +67,24 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         String place = earthquake.getPlace();
         earthquakeViewHolder.mPlace.setText(place);
 
-        String date = earthquake.getDate();
+        String date = getFormattedDate(earthquake.getTime());
         earthquakeViewHolder.mDate.setText(date);
 
+        String time = getFormattedTime(earthquake.getTime());
+        earthquakeViewHolder.mTime.setText(time);
+
         return earthquakeView;
+    }
+
+    private String getFormattedDate(long time) {
+        Date date = new Date(time);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("LLL dd, yyyy", Locale.getDefault());
+        return dateFormat.format(date);
+    }
+
+    private String getFormattedTime(long time) {
+        Date date = new Date(time);
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
+        return timeFormat.format(date);
     }
 }
