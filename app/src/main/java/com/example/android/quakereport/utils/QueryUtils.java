@@ -73,8 +73,11 @@ public final class QueryUtils {
                 // Get time when the earthquake occurred
                 long time = properties.optLong("time");
 
+                // Get url of the earthquake report
+                String url = properties.optString("url");
+
                 // Add the earthquake to the list
-                earthquakes.add(new Earthquake(magnitude, place, time));
+                earthquakes.add(new Earthquake(magnitude, place, time, url));
             }
         } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,
