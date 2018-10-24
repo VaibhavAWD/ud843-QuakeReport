@@ -17,8 +17,10 @@ package com.example.android.quakereport;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.example.android.quakereport.adapter.EarthquakeAdapter;
+import com.example.android.quakereport.model.Earthquake;
 
 import java.util.ArrayList;
 
@@ -31,25 +33,30 @@ public class EarthquakeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
-        // Create a fake list of earthquake locations.
-        ArrayList<String> earthquakes = new ArrayList<>();
-        earthquakes.add("San Francisco");
-        earthquakes.add("London");
-        earthquakes.add("Tokyo");
-        earthquakes.add("Mexico City");
-        earthquakes.add("Moscow");
-        earthquakes.add("Rio de Janeiro");
-        earthquakes.add("Paris");
-
         // Find a reference to the {@link ListView} in the layout
-        ListView earthquakeListView = (ListView) findViewById(R.id.list);
+        ListView earthquakeListView = findViewById(R.id.list);
 
-        // Create a new {@link ArrayAdapter} of earthquakes
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1, earthquakes);
+        // Create a new {@link EarthquakeAdapter} of earthquakes
+        EarthquakeAdapter earthquakeAdapter = new EarthquakeAdapter(this, getEarthquakeList());
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
-        earthquakeListView.setAdapter(adapter);
+        earthquakeListView.setAdapter(earthquakeAdapter);
+    }
+
+    private ArrayList<Earthquake> getEarthquakeList() {
+        ArrayList<Earthquake> earthquakeList = new ArrayList<>();
+        earthquakeList.add(new Earthquake(7.9, "San Fransisco", "Nov 12, 2016"));
+        earthquakeList.add(new Earthquake(6.1, "London", "Jan 21, 2015"));
+        earthquakeList.add(new Earthquake(5.4, "Mexico City", "May 30, 2014"));
+        earthquakeList.add(new Earthquake(4.8, "Tokyo", "Jun 15, 2013"));
+        earthquakeList.add(new Earthquake(6.3, "San Fransisco", "Aug 21, 2012"));
+        earthquakeList.add(new Earthquake(5.3, "Hong Kong", "Oct 16, 2011"));
+        earthquakeList.add(new Earthquake(7.1, "Rio de Janeiro", "Dec 11, 2010"));
+        earthquakeList.add(new Earthquake(4.9, "Paris", "Apr 19, 2009"));
+        earthquakeList.add(new Earthquake(5.7, "Moscow", "Feb 26, 2008"));
+        earthquakeList.add(new Earthquake(6.2, "Havana", "Jul 28, 2007"));
+
+        return earthquakeList;
     }
 }
