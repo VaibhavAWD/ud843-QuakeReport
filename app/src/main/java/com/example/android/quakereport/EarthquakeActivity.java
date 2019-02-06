@@ -107,8 +107,10 @@ public class EarthquakeActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Earthquake> earthquakes) {
-            mEarthquakes = earthquakes;
-            updateUi();
+            if (earthquakes != null && !earthquakes.isEmpty()) {
+                mEarthquakes = earthquakes;
+                updateUi();
+            }
         }
 
     }
