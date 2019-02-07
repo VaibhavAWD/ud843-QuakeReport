@@ -23,11 +23,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +58,9 @@ public class EarthquakeActivity extends AppCompatActivity
     @BindView(R.id.text_empty_state)
     TextView mDisplayEmptyState;
 
+    @BindView(R.id.progress_indicator)
+    ProgressBar mProgressIndicator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +86,7 @@ public class EarthquakeActivity extends AppCompatActivity
         if (hasConnection()) {
             getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID, null, this);
         } else {
+            hideProgressIndicator();
             mDisplayEmptyState.setText(getString(R.string.error_no_internet_connection));
         }
 
@@ -116,6 +120,8 @@ public class EarthquakeActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
+        hideProgressIndicator();
+
         if (earthquakes != null && !earthquakes.isEmpty()) {
             updateUi(earthquakes);
         } else {
@@ -134,6 +140,10 @@ public class EarthquakeActivity extends AppCompatActivity
     private void updateUi(List<Earthquake> earthquakes) {
         mEarthquakeAdapter.clear();
         mEarthquakeAdapter.addAll(earthquakes);
+    }
+
+    private void hideProgressIndicator() {
+        mProgressIndicator.setVisibility(View.GONE);
     }
 
     /**
