@@ -19,11 +19,15 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -46,7 +50,7 @@ public class EarthquakeActivity extends AppCompatActivity
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
 
-    private static final String REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=3&limit=20";
+    private static final Uri BASE_URI = Uri.parse("https://earthquake.usgs.gov/fdsnws/event/1/query");
 
     private static final int EARTHQUAKE_LOADER_ID = 1;
 
@@ -109,10 +113,28 @@ public class EarthquakeActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_earthquake, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        switch (id) {
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public Loader<List<Earthquake>> onCreateLoader(int loaderId, Bundle bundle) {
         switch (loaderId) {
             case EARTHQUAKE_LOADER_ID:
-                return new EarthquakeLoader(this, REQUEST_URL);
+                return new EarthquakeLoader(this, getPreferredUrl());
             default:
                 return null;
         }
@@ -132,6 +154,25 @@ public class EarthquakeActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<List<Earthquake>> loader) {
         mEarthquakeAdapter.clear();
+    }
+
+    private String getPreferredUrl() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String minMagnitude = pref.getString(
+                getString(R.string.pref_key_min_magnitude),
+                getString(R.string.pref_default_min_magnitude));
+
+        String orderBy = pref.getString(
+                getString(R.string.pref_key_order_by),
+                getString(R.string.pref_default_order_by));
+
+        Uri.Builder uriBuilder = BASE_URI.buildUpon();
+        uriBuilder.appendQueryParameter("format", "geojson");
+        uriBuilder.appendQueryParameter("limit", "20");
+        uriBuilder.appendQueryParameter("minmag", minMagnitude);
+        uriBuilder.appendQueryParameter("orderby", orderBy);
+
+        return uriBuilder.toString();
     }
 
     /**
