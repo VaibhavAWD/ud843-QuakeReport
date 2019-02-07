@@ -18,4 +18,5 @@
     <string name="near_the">Near the</string>
     <string name="warn_no_app_found">No app found to handle this action</string>
     <string name="error_no_internet_connection">No internet connection</string>
+    <string name="error_no_earthquakes_found">No earthquakes found.</string>
 </resources>

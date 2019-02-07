@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.quakereport.adapter.EarthquakeAdapter;
@@ -54,6 +55,9 @@ public class EarthquakeActivity extends AppCompatActivity
     @BindView(R.id.list)
     ListView mEarthquakeListView;
 
+    @BindView(R.id.text_empty_state)
+    TextView mDisplayEmptyState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,12 +72,18 @@ public class EarthquakeActivity extends AppCompatActivity
         // so the list can be populated in the user interface
         mEarthquakeListView.setAdapter(mEarthquakeAdapter);
 
+        // Set empty view to the ListView so that in case
+        // of no earthquakes were found or there is no
+        // internet connection then we can show something
+        // to the user to understand what exactly happened
+        // instead of showing blank screen
+        mEarthquakeListView.setEmptyView(mDisplayEmptyState);
+
         // Check internet connectivity before making network calls
         if (hasConnection()) {
             getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID, null, this);
         } else {
-            Toast.makeText(this, R.string.error_no_internet_connection,
-                    Toast.LENGTH_SHORT).show();
+            mDisplayEmptyState.setText(getString(R.string.error_no_internet_connection));
         }
 
         mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -108,6 +118,8 @@ public class EarthquakeActivity extends AppCompatActivity
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
         if (earthquakes != null && !earthquakes.isEmpty()) {
             updateUi(earthquakes);
+        } else {
+            mDisplayEmptyState.setText(R.string.error_no_earthquakes_found);
         }
     }
 
