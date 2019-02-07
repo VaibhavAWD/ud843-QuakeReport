@@ -15,12 +15,13 @@
  */
 package com.example.android.quakereport;
 
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +32,7 @@ import android.widget.Toast;
 
 import com.example.android.quakereport.adapter.EarthquakeAdapter;
 import com.example.android.quakereport.model.Earthquake;
-import com.example.android.quakereport.utils.QueryUtils;
+import com.example.android.quakereport.network.EarthquakeLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +40,16 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class EarthquakeActivity extends AppCompatActivity {
+public class EarthquakeActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<List<Earthquake>> {
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
 
-    private static final String REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
+    private static final String REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=3&limit=20";
 
-    private static final String KEY_CURRENT_EARTHQUAKES = "KEY_CURRENT_EARTHQUAKES";
+    private static final int EARTHQUAKE_LOADER_ID = 1;
 
-    private List<Earthquake> mEarthquakes;
+    private EarthquakeAdapter mEarthquakeAdapter;
 
     @BindView(R.id.list)
     ListView mEarthquakeListView;
@@ -58,22 +60,20 @@ public class EarthquakeActivity extends AppCompatActivity {
         setContentView(R.layout.earthquake_activity);
         ButterKnife.bind(this);
 
-        /*
-          Display the current earthquakes if the saved instance state is not null
-          and contains list of earthquakes otherwise make network call and retrieve
-          new earthquakes with respect to the request URL.
-         */
-        if (savedInstanceState != null && savedInstanceState.containsKey(KEY_CURRENT_EARTHQUAKES)) {
-            mEarthquakes = savedInstanceState.getParcelableArrayList(KEY_CURRENT_EARTHQUAKES);
-            updateUi();
+        // Create a new {@link EarthquakeAdapter} of earthquakes
+        mEarthquakeAdapter =
+                new EarthquakeAdapter(getApplicationContext(), new ArrayList<Earthquake>());
+
+        // Set the adapter on the {@link ListView}
+        // so the list can be populated in the user interface
+        mEarthquakeListView.setAdapter(mEarthquakeAdapter);
+
+        // Check internet connectivity before making network calls
+        if (hasConnection()) {
+            getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID, null, this);
         } else {
-            // Check internet connectivity before making network calls
-            if (hasConnection()) {
-                new EarthquakeAsyncTask().execute();
-            } else {
-                Toast.makeText(this, R.string.error_no_internet_connection,
-                        Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(this, R.string.error_no_internet_connection,
+                    Toast.LENGTH_SHORT).show();
         }
 
         mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -94,38 +94,34 @@ public class EarthquakeActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Make HTTP request and fetch earthquakes on Background Thread and publish the
-     * results on the UI Thread using {@link AsyncTask}.
-     */
-    private class EarthquakeAsyncTask extends AsyncTask<Void, Void, List<Earthquake>> {
-
-        @Override
-        protected List<Earthquake> doInBackground(Void... voids) {
-            return QueryUtils.fetchEarthquakes(REQUEST_URL);
+    @Override
+    public Loader<List<Earthquake>> onCreateLoader(int loaderId, Bundle bundle) {
+        switch (loaderId) {
+            case EARTHQUAKE_LOADER_ID:
+                return new EarthquakeLoader(this, REQUEST_URL);
+            default:
+                return null;
         }
+    }
 
-        @Override
-        protected void onPostExecute(List<Earthquake> earthquakes) {
-            if (earthquakes != null && !earthquakes.isEmpty()) {
-                mEarthquakes = earthquakes;
-                updateUi();
-            }
+    @Override
+    public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
+        if (earthquakes != null && !earthquakes.isEmpty()) {
+            updateUi(earthquakes);
         }
+    }
 
+    @Override
+    public void onLoaderReset(Loader<List<Earthquake>> loader) {
+        mEarthquakeAdapter.clear();
     }
 
     /**
      * Loads the earthquakes in the ListView.
      */
-    private void updateUi() {
-        // Create a new {@link EarthquakeAdapter} of earthquakes
-        EarthquakeAdapter earthquakeAdapter =
-                new EarthquakeAdapter(getApplicationContext(), mEarthquakes);
-
-        // Set the adapter on the {@link ListView}
-        // so the list can be populated in the user interface
-        mEarthquakeListView.setAdapter(earthquakeAdapter);
+    private void updateUi(List<Earthquake> earthquakes) {
+        mEarthquakeAdapter.clear();
+        mEarthquakeAdapter.addAll(earthquakes);
     }
 
     /**
@@ -140,17 +136,5 @@ public class EarthquakeActivity extends AppCompatActivity {
         } else {
             return false;
         }
-    }
-
-    /**
-     * Store the current earthquakes in order to avoid making
-     * repetitive network calls on config changes.
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle currentState) {
-        currentState.putParcelableArrayList(
-                KEY_CURRENT_EARTHQUAKES,
-                (ArrayList<? extends Parcelable>) mEarthquakes);
-        super.onSaveInstanceState(currentState);
     }
 }
